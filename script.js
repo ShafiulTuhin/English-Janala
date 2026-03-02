@@ -1,8 +1,8 @@
-const getLessons = () => {
+const getLevels = () => {
   const url = "https://openapi.programming-hero.com/api/levels/all";
   fetch(url)
     .then((res) => res.json())
-    .then((json) => displayLessons(json.data));
+    .then((json) => displayLevels(json.data));
 };
 
 const removeActive = () => {
@@ -24,6 +24,41 @@ const getLevelWords = (id) => {
     });
 };
 
+const getWordDetails = async (id) => {
+  const url = `https://openapi.programming-hero.com/api/word/${id}`;
+  //   fetch(url)
+  //     .then((res) => res.json())
+  //     .then((data) => displayWordDetails(data.data));
+  const res = await fetch(url);
+  const data = await res.json();
+  displayWordDetails(data.data);
+};
+const displayWordDetails = (word) => {
+  console.log(word);
+  const detailModal = document.getElementById("modal-details");
+  detailModal.innerHTML = ` 
+        <h2 class="font-semibold text-4xl mb-5">${word.word} (<i class="fa-solid fa-microphone"></i>:${word.pronunciation})</h2>
+          <p class="font-semibold text-2xl mb-2">Meaning</p>
+          <p class="font-bangla font-medium text-2xl mb-5">${word.meaning}</p>
+          <p class="font-semibold text-2xl">Example</p>
+          <p class="mb-5">${word.sentence}</p>
+          <p class="font-bangla font-semibold text-2xl mb-2">সমার্থক শব্দগুলো</p>
+          <p class = "flex gap-2 flex-wrap">${
+            word.synonyms && word.synonyms.length > 0
+              ? word.synonyms
+                  .map(
+                    (syn) => `
+                <span class="bg-slate-200 px-4 py-2 rounded-lg">${syn}</span>
+                `,
+                  )
+                  .join(" ")
+              : `<span class= "bg-slate-200 px-4 py-2 rounded-lg">No synonyms found</span>`
+          }</p>
+           <button class=" text-[#422AD5] border-1 font-semibold px-4 py-2 cursor-pointer hover:bg-blue-800 hover:text-white transition duration-300 rounded-lg mt-5">Complete Learning</button>
+          `;
+  const wordModal = document.getElementById("word_modal");
+  wordModal.showModal();
+};
 const displayLevelWords = (words) => {
   const wordContainer = document.getElementById("word-container");
   wordContainer.innerHTML = "";
@@ -53,8 +88,8 @@ const displayLevelWords = (words) => {
           word.pronunciation
         }"
         </h2>
-        <div class="flex justify-between items-center px-6 mt-10 >
-            <button class="bg-slate-200 p-3 rounded-lg hover:bg-[#18181B] hover:text-white transition duration-300">
+        <div class="flex justify-between items-center px-6 mt-10" >
+            <button onclick="getWordDetails(${word.id})" class="bg-slate-200 p-3 rounded-lg hover:bg-[#18181B] hover:text-white transition duration-300">
                 <i class="fa-solid fa-circle-exclamation  text-[24px]"></i>
             </button>
 
@@ -67,7 +102,7 @@ const displayLevelWords = (words) => {
     wordContainer.appendChild(wordDiv);
   });
 };
-const displayLessons = (lessons) => {
+const displayLevels = (lessons) => {
   const levelContainer = document.getElementById("level");
   levelContainer.innerHTML = "";
 
@@ -84,4 +119,4 @@ const displayLessons = (lessons) => {
     levelContainer.appendChild(divBtn);
   }
 };
-getLessons();
+getLevels();
