@@ -178,7 +178,7 @@
       </div>
     </section>
 
-    <!-- Learn Section -->
+    <!-- Word details Section from level -->
     <section class="container mx-auto">
       <h2 class="text-[#00BCFF] font-extrabold text-4xl mb-3 text-center">
         Let's <span class="text-black">learn vocabulary</span>
@@ -186,10 +186,30 @@
       <!-- render all level -->
       <div id="level" class="flex gap-3 flex-wrap justify-center mt-5"></div>
       <!-- render all lessons on level -->
+      <!-- Search  -->
+      <div class="text-center mt-8">
+        <div class="join">
+          <div>
+            <label class="input validator join-item">
+              <input
+                id="input-search"
+                type="text"
+                placeholder="Type here"
+                required
+              />
+            </label>
+          </div>
+          <button id="search-button" class="btn btn-primary join-item">
+            Search
+          </button>
+        </div>
+      </div>
+      <!-- Spinner -->
       <div id="spinner" class="text-center py-20 hidden">
         <span class="loading loading-bars loading-xl"></span>
       </div>
 
+      <!-- Word container -->
       <div
         id="word-container"
         class="bg-slate-100 text-center p-5 mt-6 flex justify-between items-center flex-wrap gap-5 rounded-lg"

@@ -142,3 +142,39 @@ const displayLevelWords = (words) => {
 };
 
 getLevels();
+
+// search words from level
+const searchBtn = document.getElementById("search-button");
+searchBtn.addEventListener("click", () => {
+  removeActive();
+  manageSpinner(true);
+  console.log("clicked");
+  const input = document.getElementById("input-search");
+  const searchValue = input.value.trim().toLowerCase();
+  console.log(searchValue);
+
+  const url = "https://openapi.programming-hero.com/api/words/all";
+  fetch(url)
+    .then((res) => res.json())
+    .then((data) => {
+      const allWords = data.data;
+      console.log(allWords);
+      const filterWords = allWords.filter((word) =>
+        word.word.toLowerCase().includes(searchValue),
+      );
+      filterWords && filterWords.length > 0
+        ? displayLevelWords(filterWords)
+        : (document.getElementById("word-container").innerHTML = `
+     <div class="space-y-5 py-16 text-center w-full">
+       <img src="assets/alert-error.png" alt="" class="mx-auto">
+          <p class="font-bangla text-[#79716B]">
+           দুঃখিত,এই Vocabulary যুক্ত করা হয়নি।
+          </p>
+          <h2 class="font-bold text-[34px] text-[#292524] font-bangla">
+            পরবর্তী vocabulary search  করুন।
+          </h2>
+        </div>
+    `);
+      manageSpinner(false);
+    });
+});
