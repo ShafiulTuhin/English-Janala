@@ -1,17 +1,30 @@
+// Fetching all levels
 const getLevels = () => {
   const url = "https://openapi.programming-hero.com/api/levels/all";
   fetch(url)
     .then((res) => res.json())
     .then((json) => displayLevels(json.data));
 };
-
+// Remove active from all buttons
 const removeActive = () => {
   const lessonsButtons = document.querySelectorAll(".lesson-btn");
   lessonsButtons.forEach((btn) => {
     btn.classList.remove("bg-blue-800", "text-white");
   });
 };
+// Spinner
+const manageSpinner = (status) => {
+  if (status === true) {
+    document.getElementById("spinner").classList.remove("hidden");
+    document.getElementById("word-container").classList.add("hidden");
+  } else {
+    document.getElementById("spinner").classList.add("hidden");
+    document.getElementById("word-container").classList.remove("hidden");
+  }
+};
+// Fetching all words that related to the level
 const getLevelWords = (id) => {
+  manageSpinner(true);
   const url = `https://openapi.programming-hero.com/api/level/${id}`;
   fetch(url)
     .then((res) => res.json())
@@ -23,7 +36,7 @@ const getLevelWords = (id) => {
       displayLevelWords(data.data);
     });
 };
-
+// Fetching details of a word
 const getWordDetails = async (id) => {
   const url = `https://openapi.programming-hero.com/api/word/${id}`;
   //   fetch(url)
@@ -33,8 +46,21 @@ const getWordDetails = async (id) => {
   const data = await res.json();
   displayWordDetails(data.data);
 };
+// rendering synonyms array from word details
+const getSynonyms = (arr) => {
+  return arr && arr.length > 0
+    ? arr
+        .map(
+          (syn) =>
+            `<span class="bg-slate-200 px-4 py-2 rounded-lg">${syn}</span>`,
+        )
+        .join(" ")
+    : `<span class= "bg-slate-200 px-4 py-2 rounded-lg">No synonyms found</span>`;
+};
+// Display details in word Modal
 const displayWordDetails = (word) => {
   console.log(word);
+
   const detailModal = document.getElementById("modal-details");
   detailModal.innerHTML = ` 
         <h2 class="font-semibold text-4xl mb-5">${word.word} (<i class="fa-solid fa-microphone"></i>:${word.pronunciation})</h2>
@@ -43,22 +69,32 @@ const displayWordDetails = (word) => {
           <p class="font-semibold text-2xl">Example</p>
           <p class="mb-5">${word.sentence}</p>
           <p class="font-bangla font-semibold text-2xl mb-2">সমার্থক শব্দগুলো</p>
-          <p class = "flex gap-2 flex-wrap">${
-            word.synonyms && word.synonyms.length > 0
-              ? word.synonyms
-                  .map(
-                    (syn) => `
-                <span class="bg-slate-200 px-4 py-2 rounded-lg">${syn}</span>
-                `,
-                  )
-                  .join(" ")
-              : `<span class= "bg-slate-200 px-4 py-2 rounded-lg">No synonyms found</span>`
-          }</p>
+    
+          <p>${getSynonyms(word.synonyms)}</p>
            <button class=" text-[#422AD5] border-1 font-semibold px-4 py-2 cursor-pointer hover:bg-blue-800 hover:text-white transition duration-300 rounded-lg mt-5">Complete Learning</button>
           `;
+
   const wordModal = document.getElementById("word_modal");
   wordModal.showModal();
 };
+// Display all levels
+const displayLevels = (lessons) => {
+  const levelContainer = document.getElementById("level");
+  levelContainer.innerHTML = "";
+
+  for (let lesson of lessons) {
+    const divBtn = document.createElement("div");
+    divBtn.innerHTML = `
+     <button id="active-btn-${lesson.level_no}" onclick = "getLevelWords(${lesson.level_no})" class="inline-block text-[#422AD5] border-1 font-semibold px-4 py-2 cursor-pointer hover:bg-blue-800 hover:text-white transition duration-300 rounded-lg lesson-btn">
+       <i class="fa-solid fa-book"></i>
+        <span class="ml-2">Level - ${lesson.level_no}</span>
+     </button
+                >
+    `;
+    levelContainer.appendChild(divBtn);
+  }
+};
+// Display all words, word container
 const displayLevelWords = (words) => {
   const wordContainer = document.getElementById("word-container");
   wordContainer.innerHTML = "";
@@ -74,18 +110,19 @@ const displayLevelWords = (words) => {
           </h2>
         </div>
     `;
+    manageSpinner(false);
     return;
   }
   words.forEach((word) => {
     const wordDiv = document.createElement("div");
     wordDiv.classList =
-      "word-card bg-white py-20 px-5 md:w-[480px] w-full h-[372px] space-y-4";
+      "word-card bg-white py-20 px-5 md:w-[480px] w-full h-[450px] space-y-4";
 
     wordDiv.innerHTML = `
         <h2 class="text-black text-[32px] font-bold">${word.word ? word.word : "শব্দ পাওয়া যায়নি"}</h2>
         <p class="text-[20px] font-medium">Meaning / Pronounciation</p>
         <h2 class="font-bangla font-semibold text-[#18181B] text-[32px]">"${word.meaning ? word.meaning : "অর্থ পাওয়া যায়নি"} / ${
-          word.pronunciation
+          word.pronunciation ? word.pronunciation : "উচ্চারণ পাওয়া যায়নি"
         }"
         </h2>
         <div class="flex justify-between items-center px-6 mt-10" >
@@ -101,22 +138,7 @@ const displayLevelWords = (words) => {
 
     wordContainer.appendChild(wordDiv);
   });
+  manageSpinner(false);
 };
-const displayLevels = (lessons) => {
-  const levelContainer = document.getElementById("level");
-  levelContainer.innerHTML = "";
 
-  for (let lesson of lessons) {
-    console.log(lesson);
-    const divBtn = document.createElement("div");
-    divBtn.innerHTML = `
-     <button id="active-btn-${lesson.level_no}" onclick = "getLevelWords(${lesson.level_no})" class="inline-block text-[#422AD5] border-1 font-semibold px-4 py-2 cursor-pointer hover:bg-blue-800 hover:text-white transition duration-300 rounded-lg lesson-btn">
-       <i class="fa-solid fa-book"></i>
-        <span class="ml-2">Level - ${lesson.level_no}</span>
-     </button
-                >
-    `;
-    levelContainer.appendChild(divBtn);
-  }
-};
 getLevels();
